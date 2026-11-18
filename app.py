@@ -1,7 +1,9 @@
 import hashlib
+import io
 from datetime import datetime, timezone
 from pathlib import Path
 import streamlit as st
+from PIL import Image, ExifTags
 
 st.set_page_config(page_title="MediaCheck", page_icon="🔎")
 st.title("🔎 MediaCheck")
@@ -21,6 +23,35 @@ if uploaded:
     suffix = Path(uploaded.name).suffix.lower()
     if suffix in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
         st.image(data, use_container_width=True)
+        st.subheader("Image inspection")
+        try:
+            with Image.open(io.BytesIO(data)) as image:
+                exif = image.getexif()
+                exif_names = {ExifTags.TAGS.get(key, str(key)): str(value) for key, value in exif.items()}
+                st.write(f"Dimensions: {image.width} × {image.height} pixels")
+                st.write(f"Format: {image.format or 'Unknown'}")
+                software = exif_names.get("Software")
+                if software:
+                    st.write(f"Software metadata: {software}")
+                    st.caption("Editing software metadata can indicate a resave, but does not by itself mean an image is deceptive.")
+                else:
+                    st.write("No software field was found in EXIF metadata.")
+                    st.caption("Metadata is often removed by messaging and social platforms; missing metadata is not evidence of manipulation.")
+                if exif_names:
+                    with st.expander("View available EXIF metadata"):
+                        st.json(exif_names)
+                if image.format in {"JPEG", "MPO"}:
+                    recompressed = io.BytesIO()
+                    image.convert("RGB").save(recompressed, format="JPEG", quality=90)
+                    recompressed.seek(0)
+                    with Image.open(recompressed) as reference:
+                        ela = Image.blend(image.convert("RGB"), reference.convert("RGB"), 0.5)
+                    st.image(ela, caption="JPEG recompression comparison (visual aid only)", use_container_width=True)
+                    st.caption("Uneven differences can result from normal texture, editing, or compression. This view is not an AI detector and cannot identify a fake by itself.")
+                else:
+                    st.info("JPEG recompression comparison is available for JPEG images only.")
+        except Exception as exc:
+            st.error(f"Could not inspect this image: {exc}")
     elif suffix in {".mp4", ".mov", ".webm", ".mkv"}:
         st.video(data)
     elif suffix in {".mp3", ".wav", ".m4a", ".ogg"}:
@@ -45,3 +76,4 @@ if st.button("Prepare verification notes"):
 st.header("Useful resources")
 st.markdown("- [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)\n- [Google Lens](https://lens.google.com/)\n- [Deepware FAQ](https://deepware.ai/us/faq/index.html)\n- [Content Credentials Verify](https://contentcredentials.org/verify)")
 st.caption("Files are used in the app session. External services receive any media you submit to them under their own privacy terms.")
+
