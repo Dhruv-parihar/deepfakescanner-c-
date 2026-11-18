@@ -3,7 +3,7 @@ import io
 from datetime import datetime, timezone
 from pathlib import Path
 import streamlit as st
-from PIL import Image, ExifTags
+from PIL import Image, ImageChops, ImageEnhance, ExifTags
 
 st.set_page_config(page_title="MediaCheck", page_icon="🔎")
 st.title("🔎 MediaCheck")
@@ -45,9 +45,13 @@ if uploaded:
                     image.convert("RGB").save(recompressed, format="JPEG", quality=90)
                     recompressed.seek(0)
                     with Image.open(recompressed) as reference:
-                        ela = Image.blend(image.convert("RGB"), reference.convert("RGB"), 0.5)
-                    st.image(ela, caption="JPEG recompression comparison (visual aid only)", use_container_width=True)
-                    st.caption("Uneven differences can result from normal texture, editing, or compression. This view is not an AI detector and cannot identify a fake by itself.")
+                        diff = ImageChops.difference(image.convert("RGB"), reference.convert("RGB"))
+                        extrema = diff.getextrema()
+                        peak = max((channel[1] for channel in extrema), default=0)
+                        if peak:
+                            diff = ImageEnhance.Contrast(diff).enhance(min(255.0 / peak, 8.0))
+                    st.image(diff, caption="Amplified JPEG recompression difference map", use_container_width=True)
+                    st.caption("Bright areas show pixels that changed during recompression. Compression, texture, and editing can all create differences; this is a visual aid, not an AI detector or a fake-image verdict.")
                 else:
                     st.info("JPEG recompression comparison is available for JPEG images only.")
         except Exception as exc:
