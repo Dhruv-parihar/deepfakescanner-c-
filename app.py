@@ -3,7 +3,7 @@ import io
 from datetime import datetime, timezone
 from pathlib import Path
 import streamlit as st
-from PIL import Image, ImageChops, ImageEnhance, ExifTags
+from PIL import Image, ImageChops, ImageEnhance, ImageOps, ExifTags
 
 st.set_page_config(page_title="MediaCheck", page_icon="🔎")
 st.title("🔎 MediaCheck")
@@ -40,18 +40,42 @@ if uploaded:
                 if exif_names:
                     with st.expander("View available EXIF metadata"):
                         st.json(exif_names)
+                evidence = []
+                score = 0
+                raw_lower = data.lower()
+                generator_names = [b"midjourney", b"stable diffusion", b"dall-e", b"firefly", b"comfyui", b"grok"]
+                if any(marker in raw_lower for marker in generator_names):
+                    evidence.append("Generator name found in embedded file data (+55)")
+                    score += 55
+                text_fields = " ".join(str(v) for v in image.info.values() if isinstance(v, (str, bytes))).lower()
+                generator_fields = ("parameters", "prompt", "workflow", "negative_prompt")
+                if any(name in image.info for name in generator_fields) or any(name in text_fields for name in ("stable diffusion", "midjourney", "dall-e", "comfyui")):
+                    evidence.append("AI-generator-style metadata found (+55)")
+                    score += 55
+                if software and any(term in software.lower() for term in ("photoshop", "gimp", "lightroom", "affinity", "snapseed", "picsart", "canva")):
+                    evidence.append(f"Editing software named in EXIF: {software} (+15)")
+                    score += 15
+                if b"c2pa" in raw_lower:
+                    evidence.append("Content Credentials marker found; check its signature and provenance (no score added)")
+                score = min(score, 100)
+                st.subheader("Image indicator score")
+                st.metric("Heuristic indicators", f"{score}%")
+                st.caption("This is a rule-based indicator score, not the probability that the image is AI-generated or fake. A trained image detector is not included.")
+                if evidence:
+                    st.write("**Findings**")
+                    for finding in evidence:
+                        st.write(f"- {finding}")
+                else:
+                    st.write("No generator or editing markers were found in the metadata checked. This does not mean the image is authentic.")
                 if image.format in {"JPEG", "MPO"}:
                     recompressed = io.BytesIO()
                     image.convert("RGB").save(recompressed, format="JPEG", quality=90)
                     recompressed.seek(0)
                     with Image.open(recompressed) as reference:
                         diff = ImageChops.difference(image.convert("RGB"), reference.convert("RGB"))
-                        extrema = diff.getextrema()
-                        peak = max((channel[1] for channel in extrema), default=0)
-                        if peak:
-                            diff = ImageEnhance.Contrast(diff).enhance(min(255.0 / peak, 8.0))
+                        diff = ImageOps.autocontrast(diff, cutoff=1)
                     st.image(diff, caption="Amplified JPEG recompression difference map", use_container_width=True)
-                    st.caption("Bright areas show pixels that changed during recompression. Compression, texture, and editing can all create differences; this is a visual aid, not an AI detector or a fake-image verdict.")
+                    st.caption("Bright areas show pixels that changed during recompression. Compression, texture, and editing can all create differences; this map does not contribute to the indicator score and is not an AI detector.")
                 else:
                     st.info("JPEG recompression comparison is available for JPEG images only.")
         except Exception as exc:
