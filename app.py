@@ -106,6 +106,6 @@ if st.button("Prepare verification notes"):
     st.download_button("Download notes", data="\n".join(lines), file_name="mediacheck-notes.txt", mime="text/plain")
 
 st.header("Useful resources")
-st.markdown("- [WeDetect AI image detector](https://wedetect.ai/)\n- [WeDetect face-swap image checker](https://wedetect.ai/deepfake-detector)\n- [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)\n- [Google Lens](https://lens.google.com/)\n- [Deepware FAQ](https://deepware.ai/us/faq/index.html)\n- [Content Credentials Verify](https://contentcredentials.org/verify)")
+st.markdown("- [WeDetect AI image detector](https://wedetect.ai/)\n- [WeDetect face-swap image checker](https://wedetect.ai/deepfake-detector)\n- [DetectVideo AI video detector](https://detectvideo.ai/)\n- [Deepfake Detector AI voice checker](https://deepfakedetector.aiaware.io/)\n- [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)\n- [Google Lens](https://lens.google.com/)\n- [Deepware FAQ](https://deepware.ai/us/faq/index.html)\n- [Content Credentials Verify](https://contentcredentials.org/verify)")
 st.caption("Files are used in the app session. External services receive any media you submit to them under their own privacy terms.")
 

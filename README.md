@@ -49,6 +49,8 @@ The app has no database or custom backend. Uploaded media is used in the active 
 
 - [WeDetect AI image detector](https://wedetect.ai/)
 - [WeDetect face-swap image checker](https://wedetect.ai/deepfake-detector)
+- [DetectVideo AI video detector](https://detectvideo.ai/)
+- [Deepfake Detector AI voice checker](https://deepfakedetector.aiaware.io/)
 - [Deepware FAQ](https://deepware.ai/us/faq/index.html)
 - [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)
 - [Content Credentials Verify](https://contentcredentials.org/verify)
