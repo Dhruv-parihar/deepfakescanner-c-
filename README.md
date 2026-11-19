@@ -1,38 +1,54 @@
 # MediaCheck
 
-A beginner-friendly cybersecurity mini project for inspecting media and practicing source verification.
+A beginner-friendly cybersecurity project for inspecting media files and practicing source verification.
 
-Features: file preview for image/audio/video, SHA-256 fingerprint, Deepware link for manual video scans, source-checking checklist, and downloadable notes.
+## What it does
 
-The app does not run an AI deepfake model or declare files authentic. Deepware scans must be submitted on Deepware's website. Deepware focuses on face manipulation in video, not images or altered audio, and results are probabilistic.
+- Previews supported image, audio, and video files.
+- Displays basic file details and a SHA-256 fingerprint.
+- For images, shows dimensions and available EXIF metadata, checks selected embedded generator/editing markers, and displays a JPEG recompression difference map.
+- Shows a rule-based image indicator score. This is not the probability an image is fake and is not produced by a trained image detector.
+- Links to WeDetect for an optional external image check. The app does not upload the file to WeDetect automatically.
+- Links to Deepware for manual video screening. Deepware focuses on facial manipulation in video; it does not scan still images or altered voices.
+- Provides a source-verification checklist and downloadable notes.
 
 ## Run locally
 
-Install Python 3.10 or newer. In Git Bash, from this folder:
+Clone the repository and enter its folder:
 
-    python -m venv .venv
-    source .venv/Scripts/activate
-    python -m pip install -r requirements.txt
-    streamlit run app.py
+```bash
+git clone https://github.com/Dhruv-parihar/deepfakescanner-c-.git
+cd deepfakescanner-c-
+```
 
-On macOS/Linux, activate with `source .venv/bin/activate`. Streamlit opens at http://localhost:8501.
+Install dependencies and start the app:
 
-## Publish
+```bash
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
 
-Create an empty GitHub repository, then push this folder. For a hosted app, deploy with Streamlit Community Cloud and select app.py.
+If you already cloned the repo, run those two commands from inside the `deepfakescanner-c-` folder. Open the local address Streamlit prints, usually http://localhost:8501.
 
-References: [Deepware FAQ](https://deepware.ai/us/faq/index.html), [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer), [Content Credentials](https://contentcredentials.org/verify).
+## External verification tools
 
-## Clone and run this repository
+- [WeDetect AI image detector](https://wedetect.ai/) accepts images and returns an estimate. Its [face-swap image checker](https://wedetect.ai/deepfake-detector) also accepts still images, not video files. To use it for a video, submit a clear screenshot of a face frame. You upload manually on WeDetect; this app does not integrate an API or send files automatically. Review WeDetect's privacy terms before submitting sensitive content.
+- [Deepware Scanner](https://scanner.deepware.ai/) is the original video link. If it is unavailable, try again later; the app does not simulate Deepware results.
 
-To download the project:
+Both services can be wrong. Scores are estimates, not proof. Check the source, date, context, and claim against independent reporting.
 
-    git clone https://github.com/Dhruv-parihar/deepfakescanner-c-.git
-    cd deepfakescanner-c-
+## Host as a web app
 
-To run it locally from the project folder:
+GitHub stores the project files; it does not run the app itself. To host it, sign in to [Streamlit Community Cloud](https://share.streamlit.io/), create an app, select repository `Dhruv-parihar/deepfakescanner-c-`, branch `main`, and app file `app.py`, then deploy. See the [official deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app).
 
-    python -m pip install -r requirements.txt
-    python -m streamlit run app.py
+## Privacy
 
-Open the local address Streamlit prints, usually http://localhost:8501. GitHub stores the code but does not host the running app. For a hosted app, deploy the repository through Streamlit Community Cloud and select branch main and app.py.
+The app has no database or custom backend. Uploaded media is used in the active app session for preview and inspection. Any media you submit to WeDetect or another external service is handled under that provider's terms. No API key is included in this repository.
+
+## References
+
+- [WeDetect AI image detector](https://wedetect.ai/)
+- [WeDetect face-swap image checker](https://wedetect.ai/deepfake-detector)
+- [Deepware FAQ](https://deepware.ai/us/faq/index.html)
+- [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)
+- [Content Credentials Verify](https://contentcredentials.org/verify)

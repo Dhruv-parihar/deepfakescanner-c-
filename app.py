@@ -80,8 +80,12 @@ if uploaded:
                     st.info("JPEG recompression comparison is available for JPEG images only.")
         except Exception as exc:
             st.error(f"Could not inspect this image: {exc}")
+        st.link_button("Check this image with WeDetect", "https://wedetect.ai/deepfake-detector")
+        st.caption("WeDetect is an external image checker. Submit the image on its site yourself; this app does not send it automatically. Its result is an estimate, not proof.")
     elif suffix in {".mp4", ".mov", ".webm", ".mkv"}:
         st.video(data)
+        st.link_button("Check a video frame with WeDetect", "https://wedetect.ai/deepfake-detector")
+        st.caption("WeDetect checks still images, not video files. Pause on a clear face frame, take a screenshot, and submit that image on WeDetect's site.")
     elif suffix in {".mp3", ".wav", ".m4a", ".ogg"}:
         st.audio(data)
 
@@ -102,6 +106,6 @@ if st.button("Prepare verification notes"):
     st.download_button("Download notes", data="\n".join(lines), file_name="mediacheck-notes.txt", mime="text/plain")
 
 st.header("Useful resources")
-st.markdown("- [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)\n- [Google Lens](https://lens.google.com/)\n- [Deepware FAQ](https://deepware.ai/us/faq/index.html)\n- [Content Credentials Verify](https://contentcredentials.org/verify)")
+st.markdown("- [WeDetect AI image detector](https://wedetect.ai/)\n- [WeDetect face-swap image checker](https://wedetect.ai/deepfake-detector)\n- [Google Fact Check Explorer](https://toolbox.google.com/factcheck/explorer)\n- [Google Lens](https://lens.google.com/)\n- [Deepware FAQ](https://deepware.ai/us/faq/index.html)\n- [Content Credentials Verify](https://contentcredentials.org/verify)")
 st.caption("Files are used in the app session. External services receive any media you submit to them under their own privacy terms.")
 
